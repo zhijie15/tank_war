@@ -1,5 +1,6 @@
 import pygame
 import os
+import random
 FPS=30
 WIDTH=1550
 HEIGHT=780
@@ -22,7 +23,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.bottom=HEIGHT-10
         self.speed=8
         self.direccion="UP"
-    def update(self) -> None:
+    def update(self):
         key_pressed =pygame.key.get_pressed()
         if key_pressed[pygame.K_RIGHT]:
             self.rect.x+=self.speed
@@ -51,6 +52,62 @@ class Player(pygame.sprite.Sprite):
     def shoot(self):
         bullet=Bullet(self.rect.centerx,self.rect.centery,self.direccion)
         all_sprites.add(bullet)
+class EnemyTank(pygame.sprite.Sprite):
+    def __init__(self,x):
+        super().__init__()
+        tank_img=pygame.image.load(os.path.join("pic","tank_sprite.png")).convert()
+        self.tank=tank_img
+        self.tank.set_colorkey(WHITE)
+        self.image=self.tank.subsurface((135,66),(34,34))
+        self.rect=self.image.get_rect()
+        self.speed=1
+        self.direccion="DOWN"
+        if x is None:
+            self.x=random.randint(0,5)
+        else:
+            self.x=x
+        self.rect.left=self.x*300
+        self.rect.top=50
+        self.step=60
+    def rand_direccion(self):
+        num=random.randint(1,4)
+        if num==1:
+            return "UP"
+        elif num==2:
+            return "DOWN"
+        elif num==3:
+            return "LEFT"
+        elif num==4:
+            return "RIGHT"
+    def move(self):
+        if (self.step<=0):
+            self.step=500
+            self.direccion=self.rand_direccion()
+        if self.direccion=="UP":
+            self.image=self.tank.subsurface((0,66),(34,34))
+            self.rect.y-=self.speed
+        if self.direccion=="DOWN":
+            self.image=self.tank.subsurface((135,66),(34,34))
+            self.rect.y+=self.speed
+        if self.direccion=="LEFT":
+            self.image=self.tank.subsurface((200,66),(34,34))
+            self.rect.x-=self.speed
+        if self.direccion=="RIGHT":
+            self.image=self.tank.subsurface((66,66),(34,34))
+            self.rect.x+=self.speed
+        if(self.rect.right>WIDTH):
+            self.rect.right=WIDTH
+            self.step=0
+        if(self.rect.left<0):
+            self.rect.left=0
+            self.step=0
+        if(self.rect.top<0):
+            self.rect.top=0
+            self.step=0
+        if(self.rect.bottom>HEIGHT):
+            self.rect.bottom=HEIGHT
+            self.step=0
+        self.step-=1
 class Bullet(pygame.sprite.Sprite):
     def __init__(self,x,y,direccion) -> None:
         super().__init__()
@@ -90,7 +147,9 @@ class Bullet(pygame.sprite.Sprite):
 
 all_sprites=pygame.sprite.Group()
 player=Player()
+enemy=EnemyTank(1)
 all_sprites.add(player)
+all_sprites.add(enemy)
 while runing:
     clock.tick(FPS)
     for even in pygame.event.get():
@@ -101,6 +160,7 @@ while runing:
                 player.shoot()
     screen.fill(BLACK)
     all_sprites.update()
+    enemy.move()
     all_sprites.draw(screen)
     pygame.display.update()
 pygame.quit()
