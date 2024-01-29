@@ -12,7 +12,7 @@ pygame.display.set_caption("坦克大战")
 clock=pygame.time.Clock()
 runing=True
 class Player(pygame.sprite.Sprite):
-    def __init__(self) -> None:
+    def __init__(self):
         super().__init__()
         tank_img=pygame.image.load(os.path.join("pic","tank_sprite.png")).convert()
         self.tank=tank_img
@@ -52,6 +52,7 @@ class Player(pygame.sprite.Sprite):
     def shoot(self):
         bullet=Bullet(self.rect.centerx,self.rect.centery,self.direccion)
         all_sprites.add(bullet)
+
 class EnemyTank(pygame.sprite.Sprite):
     def __init__(self,x):
         super().__init__()
@@ -81,7 +82,7 @@ class EnemyTank(pygame.sprite.Sprite):
             return "RIGHT"
     def move(self):
         if (self.step<=0):
-            self.step=500
+            self.step=60
             self.direccion=self.rand_direccion()
         if self.direccion=="UP":
             self.image=self.tank.subsurface((0,66),(34,34))
@@ -108,8 +109,9 @@ class EnemyTank(pygame.sprite.Sprite):
             self.rect.bottom=HEIGHT
             self.step=0
         self.step-=1
+
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self,x,y,direccion) -> None:
+    def __init__(self,x,y,direccion):
         super().__init__()
         self.bullets=['./pic/bullet.png','./pic/bullet1.png','./pic/bullet2.png','./pic/bullet3.png']
         self.direccion=direccion
@@ -147,9 +149,12 @@ class Bullet(pygame.sprite.Sprite):
 
 all_sprites=pygame.sprite.Group()
 player=Player()
-enemy=EnemyTank(1)
 all_sprites.add(player)
-all_sprites.add(enemy)
+enemy_tank_group=pygame.sprite.Group()
+for i in range(4):
+    enemy=EnemyTank(i)
+    all_sprites.add(enemy)
+    enemy_tank_group.add(enemy)
 while runing:
     clock.tick(FPS)
     for even in pygame.event.get():
@@ -160,7 +165,8 @@ while runing:
                 player.shoot()
     screen.fill(BLACK)
     all_sprites.update()
-    enemy.move()
+    for enemy in enemy_tank_group:
+        enemy.move()
     all_sprites.draw(screen)
     pygame.display.update()
 pygame.quit()
