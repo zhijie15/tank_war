@@ -1,9 +1,10 @@
 import pygame
 FPS=30
-WIDTH=500
-HEIGHT=600
+WIDTH=1550
+HEIGHT=780
 WHITE=(255,255,255)
 GREEN=(0,255,0)
+中春绿色=(0,250,154)
 pygame.init()
 screen=pygame.display.set_mode((WIDTH,HEIGHT))
 clock=pygame.time.Clock()
@@ -11,11 +12,11 @@ runing=True
 class Player(pygame.sprite.Sprite):
     def __init__(self) -> None:
         super().__init__()
-        self.image=pygame.Surface((50,50))
-        self.image.fill(GREEN)
+        self.image=pygame.Surface((25,25))
+        self.image.fill(中春绿色)
         self.rect=self.image.get_rect()
         self.rect.centerx=WIDTH/2
-        self.rect.bottom=HEIGHT-10
+        self.rect.bottom=HEIGHT
         self.speed=8
     def update(self) -> None:
         key_pressed =pygame.key.get_pressed()
