@@ -70,6 +70,17 @@ class EnemyTank(pygame.sprite.Sprite):
         self.rect.left=self.x*300
         self.rect.top=50
         self.step=60
+        self.cooling_time=1000
+        self.last_shoot_time=0
+    
+    def shoot(self):
+        now=pygame.time.get_ticks()
+        if(now-self.last_shoot_time)<self.cooling_time:
+            return
+        bullet=Bullet(self.rect.centerx,self.rect.centery,self.direccion)
+        all_sprites.add(bullet)
+        self.last_shoot_time=now
+
     def rand_direccion(self):
         num=random.randint(1,4)
         if num==1:
@@ -109,7 +120,7 @@ class EnemyTank(pygame.sprite.Sprite):
             self.rect.bottom=HEIGHT
             self.step=0
         self.step-=1
-
+        self.shoot()
 class Bullet(pygame.sprite.Sprite):
     def __init__(self,x,y,direccion):
         super().__init__()
