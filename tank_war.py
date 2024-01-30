@@ -11,6 +11,35 @@ screen=pygame.display.set_mode((WIDTH,HEIGHT))
 pygame.display.set_caption("坦克大战")
 clock=pygame.time.Clock()
 runing=True
+expl_anim={}
+expl_anim['enemy']=[]
+for i in range(1,6):
+    expl_img=pygame.image.load(os.path.join("pic",f"boom{i}.png")).convert()
+    expl_img.set_colorkey(WHITE)
+    expl_anim["enemy"].append(pygame.transform.scale(expl_img,(75,75)))
+class Explosion(pygame.sprite.Sprite):
+    def __init__(self,center,type):
+        super().__init__()
+        self.type=type
+        self.image=expl_anim[self.type][0]
+        self.rect=self.image.get_rect()
+        self.rect.center=center
+        self.frame=0
+        self.last_update=pygame.time.get_ticks()
+        self.frame_rate=50
+    def update(self) :
+        now=pygame.time.get_ticks()
+        if (now-self.last_update)>self.frame_rate:
+            self.frame+=1
+            self.last_update=now
+            if self.frame==len(expl_anim[self.type]):
+                self.kill()
+            else:
+                self.image=expl_anim[self.type][self.frame]
+                center=self.rect.center
+                self.rect=self.image.get_rect()
+                self.rect.center=center
+
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -52,6 +81,7 @@ class Player(pygame.sprite.Sprite):
     def shoot(self):
         bullet=Bullet(self.rect.centerx,self.rect.centery,self.direccion)
         all_sprites.add(bullet)
+        player_bullet_group.add(bullet)
 
 class EnemyTank(pygame.sprite.Sprite):
     def __init__(self,x):
@@ -121,6 +151,7 @@ class EnemyTank(pygame.sprite.Sprite):
             self.step=0
         self.step-=1
         self.shoot()
+
 class Bullet(pygame.sprite.Sprite):
     def __init__(self,x,y,direccion):
         super().__init__()
@@ -159,6 +190,7 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
 
 all_sprites=pygame.sprite.Group()
+player_bullet_group=pygame.sprite.Group()
 player=Player()
 all_sprites.add(player)
 enemy_tank_group=pygame.sprite.Group()
@@ -176,6 +208,10 @@ while runing:
                 player.shoot()
     screen.fill(BLACK)
     all_sprites.update()
+    hits_play_bullet_enemy_tank=pygame.sprite.groupcollide(player_bullet_group,enemy_tank_group,True,True)
+    for enemy in hits_play_bullet_enemy_tank:
+        expl=Explosion(enemy.rect.center,'enemy')
+        all_sprites.add(expl)
     for enemy in enemy_tank_group:
         enemy.move()
     all_sprites.draw(screen)
