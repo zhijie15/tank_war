@@ -15,7 +15,7 @@ expl_anim={}
 expl_anim['enemy']=[]
 for i in range(1,6):
     expl_img=pygame.image.load(os.path.join("pic",f"boom{i}.png")).convert()
-    expl_img.set_colorkey(WHITE)
+    expl_img.set_colorkey(WHITE) 
     expl_anim["enemy"].append(pygame.transform.scale(expl_img,(75,75)))
 class Explosion(pygame.sprite.Sprite):
     def __init__(self,center,type):
@@ -39,7 +39,6 @@ class Explosion(pygame.sprite.Sprite):
                 center=self.rect.center
                 self.rect=self.image.get_rect()
                 self.rect.center=center
-
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -107,7 +106,7 @@ class EnemyTank(pygame.sprite.Sprite):
         now=pygame.time.get_ticks()
         if(now-self.last_shoot_time)<self.cooling_time:
             return
-        bullet=Bullet(self.rect.centerx,self.rect.centery,self.direccion)
+        bullet=Bullet_enemy(self.rect.centerx,self.rect.centery,self.direccion)
         all_sprites.add(bullet)
         self.last_shoot_time=now
 
@@ -153,6 +152,42 @@ class EnemyTank(pygame.sprite.Sprite):
         self.shoot()
 
 class Bullet(pygame.sprite.Sprite):
+    def __init__(self,x,y,direccion):
+        super().__init__()
+        self.bullets=['./pic/bullet.png','./pic/bullet1.png','./pic/bullet2.png','./pic/bullet3.png']
+        self.direccion=direccion
+        if self.direccion=="UP":
+            self.bullet=pygame.image.load(self.bullets[0])
+        if self.direccion=="DOWN":
+            self.bullet=pygame.image.load(self.bullets[2])
+        if self.direccion=="LEFT":
+            self.bullet=pygame.image.load(self.bullets[3])
+        if self.direccion=="RIGHT":
+            self.bullet=pygame.image.load(self.bullets[1])
+        self.image=self.bullet
+        self.image.set_colorkey(WHITE)
+        self.rect=self.image.get_rect()
+        self.rect.x=x-15
+        self.rect.y=y-15
+        self.speed=10
+    def update(self):
+        if self.direccion=="UP":
+            self.rect.y-=self.speed
+        if self.direccion=="DOWN":
+            self.rect.y+=self.speed
+        if self.direccion=="LEFT":
+            self.rect.x-=self.speed
+        if self.direccion=="RIGHT":
+            self.rect.x+=self.speed
+        if self.rect.bottom>HEIGHT:
+            self.kill()
+        if self.rect.left<0:
+            self.kill()
+        if self.rect.right>WIDTH:
+            self.kill()
+        if self.rect.top<0:
+            self.kill()
+class Bullet_enemy(pygame.sprite.Sprite):
     def __init__(self,x,y,direccion):
         super().__init__()
         self.bullets=['./pic/bullet.png','./pic/bullet1.png','./pic/bullet2.png','./pic/bullet3.png']
