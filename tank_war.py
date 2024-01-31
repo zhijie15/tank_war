@@ -22,6 +22,18 @@ for i in range(1,6):
     expl_img=pygame.image.load(os.path.join("pic",f"boom{i}.png")).convert()
     expl_img.set_colorkey(WHITE) 
     expl_anim["player"].append(pygame.transform.scale(expl_img,(75,75)))
+class Life(pygame.sprite.Sprite):
+    def __init__(self,x):
+        super().__init__()
+        life_img=pygame.image.load(os.path.join("pic","life.png")).convert()
+        self.life=life_img
+        self.life.set_colorkey(WHITE)
+        self.image=self.life.subsurface((0,0),(33,27))
+        self.rect=self.image.get_rect()
+        self.x=x
+        self.rect.centerx=self.x *27
+        self.rect.bottom=33
+
 class Explosion(pygame.sprite.Sprite):
     def __init__(self,center,type):
         super().__init__()
@@ -242,6 +254,9 @@ for i in range(4):
     enemy=EnemyTank(i)
     all_sprites.add(enemy)
     enemy_tank_group.add(enemy)
+for i in range(1,4):
+    life=Life(i)
+    all_sprites.add(life)
 while runing:
     clock.tick(FPS)
     for even in pygame.event.get():
