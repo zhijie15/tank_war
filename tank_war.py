@@ -13,10 +13,15 @@ clock=pygame.time.Clock()
 runing=True
 expl_anim={}
 expl_anim['enemy']=[]
+expl_anim['player']=[]
 for i in range(1,6):
     expl_img=pygame.image.load(os.path.join("pic",f"boom{i}.png")).convert()
     expl_img.set_colorkey(WHITE) 
     expl_anim["enemy"].append(pygame.transform.scale(expl_img,(75,75)))
+for i in range(1,6):
+    expl_img=pygame.image.load(os.path.join("pic",f"boom{i}.png")).convert()
+    expl_img.set_colorkey(WHITE) 
+    expl_anim["player"].append(pygame.transform.scale(expl_img,(75,75)))
 class Explosion(pygame.sprite.Sprite):
     def __init__(self,center,type):
         super().__init__()
@@ -108,6 +113,7 @@ class EnemyTank(pygame.sprite.Sprite):
             return
         bullet=Bullet_enemy(self.rect.centerx,self.rect.centery,self.direccion)
         all_sprites.add(bullet)
+        enemy_bullet_group.add(bullet)
         self.last_shoot_time=now
 
     def rand_direccion(self):
@@ -226,7 +232,10 @@ class Bullet_enemy(pygame.sprite.Sprite):
 
 all_sprites=pygame.sprite.Group()
 player_bullet_group=pygame.sprite.Group()
+enemy_bullet_group=pygame.sprite.Group()
 player=Player()
+player_tank_group=pygame.sprite.Group()
+player_tank_group.add(player)
 all_sprites.add(player)
 enemy_tank_group=pygame.sprite.Group()
 for i in range(4):
@@ -244,6 +253,10 @@ while runing:
     screen.fill(BLACK)
     all_sprites.update()
     hits_play_bullet_enemy_tank=pygame.sprite.groupcollide(player_bullet_group,enemy_tank_group,True,True)
+    hits_play_bullet_tank = pygame.sprite.groupcollide(enemy_bullet_group, player_tank_group, True, True)
+    for player in hits_play_bullet_tank:
+        expl = Explosion(player.rect.center, 'player')
+        all_sprites.add(expl)
     for enemy in hits_play_bullet_enemy_tank:
         expl=Explosion(enemy.rect.center,'enemy')
         all_sprites.add(expl)
