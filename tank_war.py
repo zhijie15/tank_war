@@ -271,7 +271,8 @@ while runing:
     hits_play_bullet_tank = pygame.sprite.groupcollide(enemy_bullet_group, player_tank_group, True, True)
     for player in hits_play_bullet_tank:
         expl = Explosion(player.rect.center, 'player')
-        all_sprites.add(expl)
+        all_sprites.add(expl) 
+        pygame.quit()
     for enemy in hits_play_bullet_enemy_tank:
         expl=Explosion(enemy.rect.center,'enemy')
         all_sprites.add(expl)
